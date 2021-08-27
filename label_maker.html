@@ -109,23 +109,23 @@
       <span class="alert instructions">
         Instructions:<br />
         Select the type of card you want to create. Add the information in the form below. When you're finished, right
-        click the page and select print.
+        click the page and select print. Make sure to select
         Make sure to turn on background images when printing.
       </span>
     </div>
     <div class="panel-row">
       <label class="row-label"><span class="row-label-text">First Name:</span>
-        <input id="first-name" type="text" placeholder="Insert First Name" />
+        <input id="first-name" type="text" placeholder="Insert First Name" value="first" />
       </label>
     </div>
     <div class="panel-row">
       <label class="row-label"><span class="row-label-text">Last Name:</span>
-        <input id="last-name" type="text" placeholder="Insert Last Name" />
+        <input id="last-name" type="text" placeholder="Insert Last Name" value="name" />
       </label>
     </div>
     <div class="panel-row">
       <label class="row-label"><span class="row-label-text">Title:</span>
-        <input id="title" type="text" placeholder="Insert Title" />
+        <input id="title" type="text" placeholder="Insert Title" value="A very long title that should fit in the box" />
       </label>
     </div>
     <div class="panel-row">
@@ -171,8 +171,6 @@
       }
     }
 
-
-
     function Label(type, values) {
       var label = document.getElementById(type).cloneNode(true);
       label.classList.remove('template');
@@ -199,13 +197,31 @@
       wrapper.appendChild(closer);
       wrapper.appendChild(label);
 
-      // page.appendChild(wrapper);
-
-      // Make the text fit
-      [...document.querySelectorAll('.top')].forEach((e) => fitText(e));
-      [...document.querySelectorAll('.bottom')].forEach((e) => fitText(e));
-
       this.element = wrapper;
+      this.label = label;
+      this.closer = closer;
+    }
+
+    Label.prototype.addTo = function (el) {
+      // Don't add more than 2 labels
+      if (Label.count >= 2) {
+        alert('No more than 2 labels fit per page');
+        return;
+      }
+
+      Label.count++;
+
+      el.appendChild(this.element);
+
+      this.fitText();
+
+      return this;
+    }
+
+    Label.prototype.fitText = function () {
+      fitText(this.label.querySelector('.top'));
+      fitText(this.label.querySelector('.bottom'));
+      return this;
     }
 
     Label.count = 0;
@@ -227,17 +243,17 @@
       var lastName = lnInput.value;
       var title = titInput.value;
 
-      if(firstName === '') {
+      if (firstName === '') {
         alert('You must provide a first name!');
         return;
       }
 
-      if(lastName === '') {
+      if (lastName === '') {
         alert('You must provide a last name!');
         return;
       }
 
-      if(title === '') {
+      if (title === '') {
         alert('You must provide a title!');
         return;
       }
@@ -248,24 +264,9 @@
         title: title
       });
 
-      // Don't add more than 2 labels
-      if (Label.count >= 2) {
-        alert('No more than 2 labels fit per page');
-        return;
-      }
+      label.addTo(page);
 
-      Label.count++;
-      page.appendChild(label.element);
     });
-
-
-    // [...document.querySelectorAll('.bottom')].forEach(function (el) {
-    //   fitText(el);
-    // });
-
-    // [...document.getElementsByClassName('card')].forEach(function(e) {
-    //   console.log(e.offsetHeight, e.offsetWidth)
-    // })
 
   </script>
 </body>
