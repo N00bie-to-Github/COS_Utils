@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -79,6 +78,7 @@
       width: 6.75in;
       font-size: 100px;
     }
+
     .alert {
       color: red;
       font-weight: bold;
@@ -87,10 +87,12 @@
       margin-bottom: 15px;
       background: rgb(255, 210, 217);
     }
+
     .instructions {
       /* font-style: italic; */
       font-size: 12pt;
     }
+
     .closer {
       height: 30px;
       width: 30px;
@@ -98,7 +100,6 @@
       float: right;
       cursor: pointer;
     }
-    
   </style>
 </head>
 
@@ -106,34 +107,33 @@
   <div class="panel no-print">
     <div class="panel-row">
       <span class="alert instructions">
-        Instructions:<br/>
-        Select the type of card you want to create. Add the information in the form below. When you're finished, right click the page and select print.
+        Instructions:<br />
+        Select the type of card you want to create. Add the information in the form below. When you're finished, right
+        click the page and select print.
         Make sure to turn on background images when printing.
       </span>
     </div>
     <div class="panel-row">
       <label class="row-label"><span class="row-label-text">First Name:</span>
-        <input id="first-name" type="text" value="fn" />
+        <input id="first-name" type="text" placeholder="Insert First Name" />
       </label>
     </div>
     <div class="panel-row">
       <label class="row-label"><span class="row-label-text">Last Name:</span>
-        <input id="last-name" type="text" value="ln" />
+        <input id="last-name" type="text" placeholder="Insert Last Name" />
       </label>
     </div>
     <div class="panel-row">
       <label class="row-label"><span class="row-label-text">Title:</span>
-        <input id="title" type="text" value="title" />
+        <input id="title" type="text" placeholder="Insert Title" />
       </label>
     </div>
     <div class="panel-row">
-      <label class="row-label multiple">
-        <div>
-          <input type="radio" class="label-type" value="downstair-single" checked /> Downstairs Single
-        </div>
-        <div>
-          <input type="radio" class="label-type" value="downstair-double" /> Downstairs Double
-        </div>
+      <label class="row-label"><span class="row-label-text">Label Type:</span>
+        <select id="label-type">
+          <option value="__downstairs_single__" selected>Downstairs Single</option>
+          <option value="__downstairs_double__">Downstairs Double</option>
+        </select>
       </label>
     </div>
     <div class="panel-row">
@@ -170,50 +170,80 @@
         el.style.lineHeight = size;
       }
     }
+
+
+
+    function Label(type, values) {
+      var label = document.getElementById(type).cloneNode(true);
+      label.classList.remove('template');
+      label.style.display = 'block';
+      label.removeAttribute('id');
+
+      // Populate it with the form data
+      label.querySelector('.top').innerHTML = values.name;
+      label.querySelector('.bottom').innerHTML = values.title;
+
+      // Create a wrapper for the label
+      var wrapper = document.createElement('div');
+      wrapper.classList.add('label-wrapper');
+      var closer = document.createElement('div');
+      closer.classList.add('closer');
+      closer.innerHTML = '⮽';
+
+      // Bind the close event
+      closer.addEventListener('click', function () {
+        Label.count--;
+        wrapper.remove();
+      });
+
+      wrapper.appendChild(closer);
+      wrapper.appendChild(label);
+
+      // page.appendChild(wrapper);
+
+      // Make the text fit
+      [...document.querySelectorAll('.top')].forEach((e) => fitText(e));
+      [...document.querySelectorAll('.bottom')].forEach((e) => fitText(e));
+
+      this.element = wrapper;
+    }
+
+    Label.count = 0;
+
     // EVENTS
     var addButton = document.getElementById('add-button');
     var fnInput = document.getElementById('first-name');
     var lnInput = document.getElementById('last-name');
     var titInput = document.getElementById('title');
 
+    var page = document.getElementById('page');
+
+    var selector = document.querySelector('#label-type');
+
+
     addButton.addEventListener('click', function () {
+
       var firstName = fnInput.value;
       var lastName = lnInput.value;
       var title = titInput.value;
 
-      var card = document.querySelector('#__downstairs_single__').cloneNode(true);
-      card.classList.remove('template');
-      card.style.display = 'block';
-      card.removeAttribute('id');
-
-      // Populate it with the form data
-      card.querySelector('.top').innerHTML = `${firstName} ${lastName}`;
-      card.querySelector('.bottom').innerHTML = `${title}`;
-      // [...card.querySelector('.bottom')].forEach(e=>e.innerHTML = `${title}`);
-
-      page = document.getElementById('page');
-      var wrapper = document.createElement('div');
-      wrapper.classList.add('card-wrapper');
-      var closer = document.createElement('div');
-      closer.classList.add('closer');
-      closer.innerHTML = '⮽';
-
-      // Bind the close event
-      closer.addEventListener('click', function() {
-        wrapper.remove();
+      var labelType = selector.value;
+      var label = new Label(selector.value, {
+        name: `${firstName} ${lastName}`,
+        title: title
       });
 
-      wrapper.appendChild(closer);
-      wrapper.appendChild(card);
-      
-      page.appendChild(wrapper);
+      // Don't add more than 2 labels
+      if (Label.count >= 2) {
+        alert('No more than 2 labels fit per page');
+        return;
+      }
 
-      // Make the text fit
-      [...document.querySelectorAll('.top')].forEach((e) => fitText(e));
-      [...document.querySelectorAll('.bottom')].forEach((e) => fitText(e));
-
-      console.log(card)
+      Label.count++;
+      page.appendChild(label.element);
     });
+
+
     // [...document.querySelectorAll('.bottom')].forEach(function (el) {
     //   fitText(el);
     // });
@@ -221,9 +251,7 @@
     // [...document.getElementsByClassName('card')].forEach(function(e) {
     //   console.log(e.offsetHeight, e.offsetWidth)
     // })
-    function Label() {
 
-    }
   </script>
 </body>
 
