@@ -227,6 +227,21 @@
       var lastName = lnInput.value;
       var title = titInput.value;
 
+      if(firstName === '') {
+        alert('You must provide a first name!');
+        return;
+      }
+
+      if(lastName === '') {
+        alert('You must provide a last name!');
+        return;
+      }
+
+      if(title === '') {
+        alert('You must provide a title!');
+        return;
+      }
+
       var labelType = selector.value;
       var label = new Label(selector.value, {
         name: `${firstName} ${lastName}`,
